@@ -76,7 +76,7 @@ def start_recording(session_id):
     # rpicam command: output raw H264 ke stdout
     rpicam_cmd = [
         "rpicam-vid",
-        "-t", "0", "--nopreview",
+        "-t", "0", "--nopreview", "--verbose", "0",
         "--width", str(WIDTH), "--height", str(HEIGHT), "--framerate", str(FPS),
         "--codec", "h264", "--inline", "--intra", str(INTRA),
         "-o", "-"   # output ke stdout
@@ -104,7 +104,7 @@ def start_recording(session_id):
                              preexec_fn=os.setsid)
     rproc.stdout.close()
 
-    print(f"Recording started with ID={SESSION_ID} -> buffer dir: {BUFFER_DIR}, highlight dir: {HIGHLIGHT_DIR}")
+    print(f"Recording started with ID={SESSION_ID}, Highlight dir: {HIGHLIGHT_DIR}")
 
 def stop_recording():
     global rproc, fproc, SESSION_ID
@@ -202,7 +202,7 @@ def save_highlight():
         "-hide_banner", "-loglevel", "error",
         "-f", "concat", "-safe", "0",
         "-i", concat_list,
-        "-c", "copy",
+        "-c", "copy", "-y",
         out_file
     ]
 
