@@ -1,4 +1,4 @@
-import subprocess, os, time, signal, glob
+import subprocess, os, time, signal, glob, shutil
 import threading
 import requests
 import RPi.GPIO as GPIO
@@ -49,6 +49,20 @@ API_URL = "https://padel.fgh-prd.com/api/"
 API_KEY = "PL4YPADEL!"
 POLL_INTERVAL = 5  # detik
 
+def cleanup_old_highlights():
+    now = time.time()
+    limit = 7 * 24 * 3600  # 7 hari
+
+    for folder in os.listdir(HIGHLIGHT_ROOT):
+        path = os.path.join(HIGHLIGHT_ROOT, folder)
+        if not os.path.isdir(path):
+            continue
+        if now - os.path.getmtime(path) > limit:
+            try:
+                shutil.rmtree(path)
+                print(f"[CLEANUP] : {path}")
+            except Exception as e:
+                print(f"CLEANUP Failed {path}: {e}")
 
 def highlight_success():
     GPIO.output(PIN_SUCCESS, GPIO.HIGH)
@@ -320,6 +334,8 @@ def poll_server():
         time.sleep(POLL_INTERVAL)
 
 if __name__ == "__main__":
+    cleanup_old_highlights()
     threading.Thread(target=monitor_highlight, daemon=True).start()
     poll_server()
     #main_loop()
+
